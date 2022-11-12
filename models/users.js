@@ -1,5 +1,20 @@
 const connection = require("../config/db");
 
+const findId = (id) => {
+  return new Promise((resolve, reject) =>
+    connection.query(
+      `SELECT COUNT(*) FROM users WHERE id=${id}`,
+      (error, results, fields) => {
+        if (!error) {
+          resolve(results);
+        } else {
+          reject(error);
+        }
+      }
+    )
+  );
+};
+
 const findEmail = (email) => {
   return new Promise((resolve, reject) =>
     connection.query(
@@ -46,4 +61,4 @@ const insertUser = (data) => {
   );
 };
 
-module.exports = { findEmail, findNip, insertUser };
+module.exports = { findId, findEmail, findNip, insertUser };
