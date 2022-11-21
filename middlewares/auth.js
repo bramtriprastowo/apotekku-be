@@ -1,18 +1,27 @@
 const jwt = require("jsonwebtoken");
-const commonHelper = require("../helper/common")
+const commonHelper = require("../helper/common");
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const accessToken = authHeader && authHeader.split(" ")[1];
-  accessToken ?? commonHelper.response(res, [], 402, "Access token not found!");
-
-  if (accessToken) {
-    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.status(401).send("gagal");
-      req.user = user;
+const authAccessToken = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const accessToken = authHeader && authHeader.split(" ")[1];
+    if (!accessToken) {
+      commonHelper.response(res, [], 402, "Access token not found!");
+    } else {
+      const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+      req.payload = decoded;
       next();
-    });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error && error.name === "JsonWebTokenError") {
+      return commonHelper.response(res, error, 401, "Invalid access token!");
+    } else if (error && error.name === "TokenExpiredError") {
+      return commonHelper.response(res, error, 401, "Access token expired!");
+    } else {
+      return commonHelper.response(res, error, 500, "Internal server error!");
+    }
   }
 };
 
-module.exports = authenticateToken;
+module.exports = { authAccessToken };
