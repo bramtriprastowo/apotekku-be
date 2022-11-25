@@ -114,7 +114,7 @@ const sellingController = {
           res,
           result,
           404,
-          "Data not found! Check your params!"
+          "Data not found! Check your ID params!"
         );
 
       return commonHelper.response(res, result, 200, "Get data success!");
@@ -149,24 +149,24 @@ const sellingController = {
     let resultSelling = {};
     let resultDetailSelling = {};
     let result = {};
+    let errorInput = [];
 
     try {
       // Verifikasi kelengkapan data untuk diinsert ke tabel
-      if (
-        !detailSellingId ||
-        !sellingId ||
-        !detailMedicines ||
-        !transactionDate ||
-        !userId ||
-        !customer
-      ) {
+      if (!detailSellingId) errorInput.push("detailSellingID not Found!");
+      if (!sellingId) errorInput.push("sellingID not Found!");
+      if (!detailMedicines) errorInput.push("detailMedicines not Found!");
+      if (!transactionDate) errorInput.push("transactionDate not Found!");
+      if (!userId) errorInput.push("userId not Found!");
+      if (!customer) errorInput.push("customer not Found!");
+
+      if (errorInput.length > 0)
         return commonHelper.response(
           res,
-          [],
+          errorInput,
           400,
-          "Incomplete input data! Check your input!"
+          "Incomplete input data! Check your input! (Check data for details!)"
         );
-      }
 
       // Menjalankan fungsi untuk melakukan insert di tabel penjualan dan detail_penjualan
       resultSelling = await insertSelling(
@@ -178,6 +178,7 @@ const sellingController = {
       if (resultSelling) {
         result = { ...result, sellingInsertedRows: resultSelling.affectedRows };
       }
+      console.log(resultSelling);
       resultDetailSelling = await insertDetailSelling(
         detailSellingId,
         sellingId,
@@ -196,17 +197,24 @@ const sellingController = {
     } catch (error) {
       console.log(error);
       // Apabila insert ke tabel penjualan berhasil namun insert ke tabel detail_penjualan gagal, maka hapus hasil insert tabel penjualan
-      if (resultSelling) {
+      if (resultSelling.length > 0) {
         deleteSelling(sellingId);
       }
+      if (error.code === "ER_DUP_ENTRY")
+        return commonHelper.response(
+          res,
+          error,
+          400,
+          "Bad request! Check your input! (Check data for details!)"
+        );
       return res.send(error);
     }
   },
 
-  updateSellingAndDetail: async (req, res) => {
-    try {
-    } catch (error) {}
-  },
+  // updateSellingAndDetail: async (req, res) => {
+  //   try {
+  //   } catch (error) {}
+  // },
 };
 
 module.exports = sellingController;

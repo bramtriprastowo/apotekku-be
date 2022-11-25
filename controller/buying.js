@@ -109,7 +109,7 @@ const buyingController = {
           res,
           result,
           404,
-          "Data not found! Check your params!"
+          "Data not found! Check your ID params!"
         );
 
       return commonHelper.response(res, result, 200, "Get data success!");
@@ -143,23 +143,23 @@ const buyingController = {
     let resultBuying = {};
     let resultDetailBuying = {};
     let result = {};
+    let inputError = [];
 
     try {
       // Verifikasi kelengkapan data untuk diinsert ke tabel
-      if (
-        !detailBuyingId ||
-        !buyingId ||
-        !detailMedicines ||
-        !transactionDate ||
-        !userId
-      ) {
+      if (!detailBuyingId) inputError.push("detailBuyingId not found!");
+      if (!buyingId) inputError.push("buyingId not found!");
+      if (!detailMedicines) inputError.push("detailMedicines not found!");
+      if (!transactionDate) inputError.push("transactionDate not found!");
+      if (!userId) inputError.push("userId not found!");
+
+      if (inputError.length > 0)
         return commonHelper.response(
           res,
-          [],
+          inputError,
           400,
-          "Incomplete input data! Check your input!"
+          "Incomplete input data! Check your input! (Check data for details!)"
         );
-      }
 
       // Menjalankan fungsi untuk melakukan insert di tabel pembelian dan detail_pembelian
       resultBuying = await insertBuying(buyingId, transactionDate, userId);
@@ -184,9 +184,16 @@ const buyingController = {
     } catch (error) {
       console.log(error);
       // Apabila insert ke tabel pembelian berhasil namun insert ke tabel detail_pembelian gagal, maka hapus hasil insert tabel pembelian
-      if (resultBuying) {
+      if (resultBuying.length > 0) {
         deleteBuying(buyingId);
       }
+      if (error.code === "ER_DUP_ENTRY")
+        return commonHelper.response(
+          res,
+          error,
+          400,
+          "Bad request! Check your input! (Check data for details!)"
+        );
       return res.send(error);
     }
   },

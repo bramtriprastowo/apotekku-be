@@ -147,7 +147,6 @@ const insertDetailSelling = (detailSellingId, sellingId, detailMedicines) => {
         resolve(result);
       } else {
         reject(error);
-        console.log(error);
       }
     })
   );
