@@ -191,3 +191,5 @@ ON detail_penjualan.ID_obat = obat.ID
 JOIN penjualan
 ON detail_penjualan.ID_penjualan = penjualan.ID
 ORDER BY detail_penjualan.ID DESC;
+
+ALTER TABLE obat CHANGE harga_jual harga_jual INT(11) NOT NULL;
