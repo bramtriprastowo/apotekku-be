@@ -1,0 +1,615 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "apotekku",
+    "contact": {}
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "securityDefinitions": {},
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "summary": "register",
+        "tags": [
+          "users"
+        ],
+        "operationId": "register",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/registerrequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "login",
+        "tags": [
+          "users"
+        ],
+        "operationId": "login",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/loginrequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/users/refresh-token": {
+      "post": {
+        "summary": "refresh token",
+        "tags": [
+          "users"
+        ],
+        "operationId": "refreshtoken",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/refreshtokenrequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/users/list": {
+      "get": {
+        "summary": "list users",
+        "tags": [
+          "users"
+        ],
+        "operationId": "listusers",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "description": ""
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "description": ""
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "orderby",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/selling/list-selling": {
+      "get": {
+        "summary": "list selling",
+        "tags": [
+          "selling"
+        ],
+        "operationId": "listselling",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/selling/list-selling/1": {
+      "get": {
+        "summary": "list selling by ID",
+        "tags": [
+          "selling"
+        ],
+        "operationId": "listsellingbyID",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/selling/list-detail": {
+      "get": {
+        "summary": "list detail selling",
+        "tags": [
+          "selling"
+        ],
+        "operationId": "listdetailselling",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/selling/insert": {
+      "post": {
+        "summary": "insert selling",
+        "tags": [
+          "selling"
+        ],
+        "operationId": "insertselling",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/insertsellingrequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/buying/list-buying": {
+      "get": {
+        "summary": "list buying",
+        "tags": [
+          "buying"
+        ],
+        "operationId": "listbuying",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/buying/list-buying/1": {
+      "get": {
+        "summary": "list buying by ID",
+        "tags": [
+          "buying"
+        ],
+        "operationId": "listbuyingbyID",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/buying/list-detail": {
+      "get": {
+        "summary": "list detail buying",
+        "tags": [
+          "buying"
+        ],
+        "operationId": "listdetailbuying",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/buying/insert": {
+      "post": {
+        "summary": "insert buying",
+        "tags": [
+          "buying"
+        ],
+        "operationId": "insertbuying",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/insertbuyingrequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "registerrequest": {
+      "title": "registerrequest",
+      "example": {
+        "id": 7,
+        "name": "Fahmi",
+        "email": "fahmi@gmail.com",
+        "nip": 22478920,
+        "password": "fahmi123"
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "nip": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "nip",
+        "password"
+      ]
+    },
+    "loginrequest": {
+      "title": "loginrequest",
+      "example": {
+        "email": "zaki@gmail.com",
+        "password": "zaki123"
+      },
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "refreshtokenrequest": {
+      "title": "refreshtokenrequest",
+      "example": {
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpemt5QGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY2OTAwOTIzOCwiZXhwIjoxNjY5MDk1NjM4fQ.RRISSId2Lg26WbOgPVODV3utSYJXL4399BiQ3b6HvCI"
+      },
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "refreshToken"
+      ]
+    },
+    "insertsellingrequest": {
+      "title": "insertsellingrequest",
+      "example": {
+        "detailSellingId": 8,
+        "sellingId": 4,
+        "customer": "Bram",
+        "detailMedicines": [
+          {
+            "id": 1,
+            "qty": 3
+          },
+          {
+            "id": 2,
+            "qty": 2
+          }
+        ],
+        "transactionDate": "2022-11-20",
+        "userId": 1
+      },
+      "type": "object",
+      "properties": {
+        "detailSellingId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sellingId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "customer": {
+          "type": "string"
+        },
+        "detailMedicines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetailMedicine"
+          }
+        },
+        "transactionDate": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "detailSellingId",
+        "sellingId",
+        "customer",
+        "detailMedicines",
+        "transactionDate",
+        "userId"
+      ]
+    },
+    "DetailMedicine": {
+      "title": "DetailMedicine",
+      "example": {
+        "id": 1,
+        "qty": 3
+      },
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "qty": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "id",
+        "qty"
+      ]
+    },
+    "insertbuyingrequest": {
+      "title": "insertbuyingrequest",
+      "example": {
+        "detailBuyingId": 21,
+        "buyingId": 6,
+        "detailMedicines": [
+          {
+            "id": 1,
+            "qty": 3
+          },
+          {
+            "id": 2,
+            "qty": 2
+          }
+        ],
+        "transactionDate": "2022-11-20",
+        "userId": 1
+      },
+      "type": "object",
+      "properties": {
+        "detailBuyingId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "buyingId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "detailMedicines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DetailMedicine"
+          }
+        },
+        "transactionDate": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "detailBuyingId",
+        "buyingId",
+        "detailMedicines",
+        "transactionDate",
+        "userId"
+      ]
+    }
+  },
+  "security": [],
+  "tags": [
+    {
+      "name": "users",
+      "description": "Operations about users"
+    },
+    {
+      "name": "selling",
+      "description": "Operations about selling transaction"
+    },
+    {
+      "name": "buying",
+      "description": "Operations about buying transaction"
+    }
+  ]
+}

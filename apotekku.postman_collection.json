@@ -1,0 +1,404 @@
+{
+	"info": {
+		"_postman_id": "a47f0cee-824c-4132-990f-7fbba456ce83",
+		"name": "apotekku",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15820714"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 7,\r\n    \"name\": \"Fahmi\",\r\n    \"email\": \"fahmi@gmail.com\",\r\n    \"nip\": 22478920,\r\n    \"password\": \"fahmi123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"zaki@gmail.com\",\r\n    \"password\": \"zaki123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpemt5QGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY2OTAwOTIzOCwiZXhwIjoxNjY5MDk1NjM4fQ.RRISSId2Lg26WbOgPVODV3utSYJXL4399BiQ3b6HvCI\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/users/refresh-token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Inpha2lAZ21haWwuY29tIiwicm9sZSI6InN1cGVydXNlciIsImlhdCI6MTY3MDU5ODI1NCwiZXhwIjoxNjcwNTk5MTU0fQ.QrtdYyrTIvenohiAfkULCdn__yZnU6a9yqLeRLSqW-c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/users/list?limit=10&page=1&order=asc&orderby=id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"list"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								},
+								{
+									"key": "orderby",
+									"value": "id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "selling",
+			"item": [
+				{
+					"name": "list selling",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJpemt5QGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY2OTAwMzY4NiwiZXhwIjoxNjY5MDA0NTg2fQ.ELX4kYK8TKl7S67TSvWa32W6FXDuxQ4WGfjE4Tc0G_g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/selling/list-selling",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"selling",
+								"list-selling"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list selling by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/selling/list-selling/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"selling",
+								"list-selling",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list detail selling",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/selling/list-detail",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"selling",
+								"list-detail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert selling",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"detailSellingId\": 8,\r\n    \"sellingId\": 4,\r\n    \"customer\": \"Bram\",\r\n    \"detailMedicines\": [{\"id\": 1, \"qty\": 3}, {\"id\": 2, \"qty\": 2}],\r\n    \"transactionDate\": \"2022-11-20\",\r\n    \"userId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/selling/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"selling",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "buying",
+			"item": [
+				{
+					"name": "list buying",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyYW1AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE2NjkwMTQyNTksImV4cCI6MTY2OTAxNTE1OX0.E2-ERPj7NMlk83pdiJ2XR6OlA-eWV9dsFv5p0aNEChY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/buying/list-buying",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"buying",
+								"list-buying"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list buying by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyYW1AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE2NjkwMTQyNTksImV4cCI6MTY2OTAxNTE1OX0.E2-ERPj7NMlk83pdiJ2XR6OlA-eWV9dsFv5p0aNEChY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/buying/list-buying/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"buying",
+								"list-buying",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list detail buying",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyYW1AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE2NjkwMTQyNTksImV4cCI6MTY2OTAxNTE1OX0.E2-ERPj7NMlk83pdiJ2XR6OlA-eWV9dsFv5p0aNEChY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/buying/list-detail",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"buying",
+								"list-detail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "insert buying",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"detailBuyingId\": 21,\r\n    \"buyingId\": 6,\r\n    \"detailMedicines\": [{\"id\": 1, \"qty\": 3}, {\"id\": 2, \"qty\": 2}],\r\n    \"transactionDate\": \"2022-11-20\",\r\n    \"userId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/buying/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"buying",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
