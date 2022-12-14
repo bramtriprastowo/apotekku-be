@@ -21,10 +21,15 @@ const selectAllDetailSelling = (limit, offset, orderby, order) => {
   );
 };
 
-const selectAllSelling = (limit, offset, orderby, order) => {
+const selectAllSelling = (limit, offset, orderby, order, id) => {
+  let searchById = "";
+  if (id) {
+    searchById = `WHERE ID = ${id}`;
+  }
   return new Promise((resolve, reject) =>
     connection.query(
       `SELECT * FROM penjualan
+      ${searchById}
       ORDER BY ${orderby} ${order} LIMIT ${limit} OFFSET ${offset}`,
       (error, result) => {
         if (!error) {

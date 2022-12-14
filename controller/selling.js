@@ -65,18 +65,25 @@ const sellingController = {
       const offset = (page - 1) * limit;
       const orderby = req.query.orderby || "penjualan.ID";
       const order = req.query.order || "DESC";
+      const id = req.query.id || "";
+      // const startDate = req.query.startDate || "";
+      // const endDate = req.query.endDate || "";
 
       //Menjalankan fungsi select all dan membuat pagination
-      const result = await selectAllSelling(limit, offset, orderby, order);
+      const result = await selectAllSelling(limit, offset, orderby, order, id);
       const [sellingCount] = await countAllSelling();
       const totalData = sellingCount.count;
       const totalPage = Math.ceil(totalData / limit);
-      const pagination = {
-        currentPage: parseInt(page),
-        limit: parseInt(limit),
-        totalPage: totalPage,
-        totalData: totalData,
-      };
+      let pagination = {};
+
+      if (!id) {
+        pagination = {
+          currentPage: parseInt(page),
+          limit: parseInt(limit),
+          totalPage: totalPage,
+          totalData: totalData,
+        };
+      }
 
       //Menampilkan hasil atau error
       commonHelper.response(res, result, 200, "Get data success!", pagination);
@@ -84,7 +91,8 @@ const sellingController = {
       console.log(error);
       if (
         error.code === "ER_SP_UNDECLARED_VAR" ||
-        error.code === "ER_BAD_FIELD_ERROR"
+        error.code === "ER_BAD_FIELD_ERROR" || 
+        error.code === "ER_PARSE_ERROR"
       ) {
         commonHelper.response(
           res,
