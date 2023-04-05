@@ -8,6 +8,7 @@ const {
   deleteSelling,
   countAllSelling,
   countAllDetailSelling,
+  searchByIdAndDate,
 } = require("../models/selling");
 
 const sellingController = {
@@ -38,7 +39,15 @@ const sellingController = {
       };
 
       //Menampilkan hasil atau error
-      commonHelper.response(res, result, 200, "Get data success!", pagination);
+      if (result.length === 0)
+        return commonHelper.response(res, result, 404, "Data not found!");
+      return commonHelper.response(
+        res,
+        result,
+        200,
+        "Get data success!",
+        pagination
+      );
     } catch (error) {
       console.log(error);
       if (
@@ -66,16 +75,38 @@ const sellingController = {
       const orderby = req.query.orderby || "penjualan.ID";
       const order = req.query.order || "DESC";
       const id = req.query.id || "";
-      // const startDate = req.query.startDate || "";
-      // const endDate = req.query.endDate || "";
+      const startDate = req.query.startDate || "";
+      const endDate = req.query.endDate || "";
+
+      //Menentukan error jika endDate lebih dahulu dari startDate
+      if(startDate && endDate){
+        const dateDif = new Date(endDate) - new Date(startDate);
+        if(dateDif < 0){
+          return commonHelper.response(res, [], 400, "startDate must be earlier than or same as endDate")
+        }
+      }
 
       //Menjalankan fungsi select all dan membuat pagination
-      const result = await selectAllSelling(limit, offset, orderby, order, id);
-      const [sellingCount] = await countAllSelling();
+      const result = await selectAllSelling(
+        limit,
+        offset,
+        orderby,
+        order,
+        id,
+        startDate,
+        endDate,
+        searchByIdAndDate
+      );
+      const [sellingCount] = await countAllSelling(
+        id,
+        startDate,
+        endDate,
+        searchByIdAndDate
+      );
       const totalData = sellingCount.count;
       const totalPage = Math.ceil(totalData / limit);
+      
       let pagination = {};
-
       if (!id) {
         pagination = {
           currentPage: parseInt(page),
@@ -86,12 +117,20 @@ const sellingController = {
       }
 
       //Menampilkan hasil atau error
-      commonHelper.response(res, result, 200, "Get data success!", pagination);
+      if (result.length === 0)
+        return commonHelper.response(res, result, 404, "Data not found!");
+      return commonHelper.response(
+        res,
+        result,
+        200,
+        "Get data success!",
+        pagination
+      );
     } catch (error) {
       console.log(error);
       if (
         error.code === "ER_SP_UNDECLARED_VAR" ||
-        error.code === "ER_BAD_FIELD_ERROR" || 
+        error.code === "ER_BAD_FIELD_ERROR" ||
         error.code === "ER_PARSE_ERROR"
       ) {
         commonHelper.response(

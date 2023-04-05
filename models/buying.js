@@ -1,8 +1,8 @@
-const connection = require("../config/db");
+const pool = require("../config/db");
 
 const selectAllDetailBuying = (limit, offset, orderby, order) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT detail_pembelian.ID, obat.nama, detail_pembelian.jumlah_satuan_obat, detail_pembelian.Subtotal, detail_pembelian.ID_pembelian, (SELECT SUM(detail_pembelian.Subtotal) AS harga_total FROM detail_pembelian) AS harga_total, pembelian.tgl_transaksi
       FROM detail_pembelian
       JOIN obat
@@ -23,7 +23,7 @@ const selectAllDetailBuying = (limit, offset, orderby, order) => {
 
 const selectAllBuying = (limit, offset, orderby, order) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT * FROM pembelian
       ORDER BY ${orderby} ${order} LIMIT ${limit} OFFSET ${offset}`,
       (error, result) => {
@@ -39,7 +39,7 @@ const selectAllBuying = (limit, offset, orderby, order) => {
 
 const selectAllBuyingById = (id, orderby, order) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT detail_pembelian.ID AS id_detail_pembelian, obat.ID AS id_obat, obat.Nama as obat, detail_pembelian.jumlah_satuan_obat, detail_pembelian.subtotal, pembelian.total FROM detail_pembelian
       JOIN obat
       ON detail_pembelian.ID_obat = obat.ID
@@ -60,7 +60,7 @@ const selectAllBuyingById = (id, orderby, order) => {
 
 const countAllBuying = () => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT COUNT(ID) AS count FROM pembelian`,
       (error, result) => {
         if (!error) {
@@ -75,7 +75,7 @@ const countAllBuying = () => {
 
 const countAllDetailBuying = () => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT COUNT(ID) AS count FROM detail_pembelian`,
       (error, result) => {
         if (!error) {
@@ -90,7 +90,7 @@ const countAllDetailBuying = () => {
 
 const insertBuying = (buyingId, transactionDate, userId) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `INSERT INTO pembelian (ID, total, tgl_transaksi, ID_users)
       VALUES (${buyingId}, 0, '${transactionDate}', ${userId})`,
       (error, result) => {
@@ -106,7 +106,7 @@ const insertBuying = (buyingId, transactionDate, userId) => {
 
 const deleteBuying = (buyingId) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `DELETE FROM pembelian WHERE ID=${buyingId}`,
       (error, result) => {
         if (!error) {
@@ -142,7 +142,7 @@ const insertDetailBuying = (detailBuyingId, buyingId, detailMedicines) => {
   insertQuery = `${subtotalQuery} ${firstMedicineQuery}${secondMedicineQuery}`;
 
   return new Promise((resolve, reject) =>
-    connection.query(`${insertQuery}`, (error, result) => {
+    pool.query(`${insertQuery}`, (error, result) => {
       if (!error) {
         resolve(result);
       } else {

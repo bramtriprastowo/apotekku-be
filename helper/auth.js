@@ -14,4 +14,11 @@ const generateRefreshToken = (payload) => {
   return refreshToken;
 };
 
-module.exports = {generateAccessToken, generateRefreshToken}
+const generateResetToken = (payload) => {
+  const resetToken = jwt.sign(payload, process.env.RESET_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
+  return resetToken;
+};
+
+module.exports = {generateAccessToken, generateRefreshToken, generateResetToken}

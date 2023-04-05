@@ -1,7 +1,5 @@
-const response = (res, result, status, message, pagination) => {
-  const resultPrint = {};
+const response = (res, data, status, message, pagination) => {
   let statusName = "";
-
   //Set status based on statuscode
   if (status >= 100 && status < 200) {
     statusName = "informational";
@@ -14,12 +12,13 @@ const response = (res, result, status, message, pagination) => {
   } else if (status >= 500 && status < 600) {
     statusName = "server error";
   }
-  
-  resultPrint.status = statusName;
-  resultPrint.statusCode = status;
-  resultPrint.data = result;
-  resultPrint.message = message || null;
-  resultPrint.pagination = pagination || {};
+  const resultPrint = {
+    status: statusName,
+    statusCode: status,
+    data,
+    message: message || null,
+    pagination: pagination || {}
+  };
   res.status(status).json(resultPrint);
 };
 

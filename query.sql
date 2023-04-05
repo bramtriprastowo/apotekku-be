@@ -193,3 +193,20 @@ ON detail_penjualan.ID_penjualan = penjualan.ID
 ORDER BY detail_penjualan.ID DESC;
 
 ALTER TABLE obat CHANGE harga_jual harga_jual INT(11) NOT NULL;
+
+-- Add is_verified column to Users Table
+ALTER TABLE users
+ADD is_verified SMALLINT(1) NOT NULL DEFAULT 0;
+
+-- users_verification
+CREATE TABLE users_verification(
+    verification_id varchar(255) NOT NULL PRIMARY KEY,
+    user_id varchar(255) NOT NULL, 
+    token varchar(255) NOT NULL
+);
+
+CREATE TABLE reset_password(
+    reset_id varchar(255) NOT NULL PRIMARY KEY,
+    user_id varchar(255) NOT NULL, 
+    token varchar(255) NOT NULL
+);

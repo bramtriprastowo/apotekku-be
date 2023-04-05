@@ -1,8 +1,28 @@
-const connection = require("../config/db");
+const pool = require("../config/db");
+
+const searchByIdAndDate = (id, startDate, endDate) => {
+  let searchByIdAndDate = "";
+  if (id) searchByIdAndDate += `WHERE ID = ${id} `;
+  if (startDate) {
+    if (id) {
+      searchByIdAndDate += `AND tgl_transaksi >= '${startDate}' `;
+    } else {
+      searchByIdAndDate += `WHERE tgl_transaksi >= '${startDate}' `;
+    }
+  }
+  if (endDate) {
+    if (id || startDate) {
+      searchByIdAndDate += `AND tgl_transaksi <= '${endDate}' `;
+    } else {
+      searchByIdAndDate += `WHERE tgl_transaksi <= '${endDate}' `;
+    }
+  }
+  return searchByIdAndDate;
+}
 
 const selectAllDetailSelling = (limit, offset, orderby, order) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT detail_penjualan.ID, obat.nama, detail_penjualan.jumlah_satuan_obat, detail_penjualan.Subtotal, detail_penjualan.ID_penjualan, (SELECT SUM(detail_penjualan.Subtotal) AS harga_total FROM detail_penjualan) AS harga_total, penjualan.tgl_transaksi
       FROM detail_penjualan
       JOIN obat
@@ -21,15 +41,12 @@ const selectAllDetailSelling = (limit, offset, orderby, order) => {
   );
 };
 
-const selectAllSelling = (limit, offset, orderby, order, id) => {
-  let searchById = "";
-  if (id) {
-    searchById = `WHERE ID = ${id}`;
-  }
+const selectAllSelling = (limit, offset, orderby, order, id, startDate, endDate, searchByIdAndDateFn) => {
+  const searchByIdAndDate = searchByIdAndDateFn(id, startDate, endDate);
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT * FROM penjualan
-      ${searchById}
+      ${searchByIdAndDate}
       ORDER BY ${orderby} ${order} LIMIT ${limit} OFFSET ${offset}`,
       (error, result) => {
         if (!error) {
@@ -44,7 +61,7 @@ const selectAllSelling = (limit, offset, orderby, order, id) => {
 
 const selectAllSellingById = (id, orderby, order) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT detail_penjualan.ID AS id_detail_penjualan, obat.ID AS id_obat, obat.Nama as obat, detail_penjualan.jumlah_satuan_obat, detail_penjualan.subtotal, penjualan.total FROM detail_penjualan
       JOIN obat
       ON detail_penjualan.ID_obat = obat.ID
@@ -63,10 +80,13 @@ const selectAllSellingById = (id, orderby, order) => {
   );
 };
 
-const countAllSelling = () => {
+const countAllSelling = (id, startDate, endDate, searchByIdAndDateFn) => {
+  const searchByIdAndDate = searchByIdAndDateFn(id, startDate, endDate);
   return new Promise((resolve, reject) =>
-    connection.query(
-      `SELECT COUNT(ID) AS count FROM penjualan`,
+    pool.query(
+      `SELECT COUNT(ID) AS count FROM penjualan
+      ${searchByIdAndDate} 
+      `,
       (error, result) => {
         if (!error) {
           resolve(result);
@@ -80,7 +100,7 @@ const countAllSelling = () => {
 
 const countAllDetailSelling = () => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `SELECT COUNT(ID) AS count FROM detail_penjualan`,
       (error, result) => {
         if (!error) {
@@ -95,7 +115,7 @@ const countAllDetailSelling = () => {
 
 const insertSelling = (sellingId, customer, transactionDate, userId) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `INSERT INTO penjualan (ID, customer, total, tgl_transaksi, ID_users)
       VALUES (${sellingId}, '${customer}', 0, '${transactionDate}', ${userId})`,
       (error, result) => {
@@ -111,7 +131,7 @@ const insertSelling = (sellingId, customer, transactionDate, userId) => {
 
 const deleteSelling = (sellingId) => {
   return new Promise((resolve, reject) =>
-    connection.query(
+    pool.query(
       `DELETE FROM penjualan WHERE ID=${sellingId}`,
       (error, result) => {
         if (!error) {
@@ -147,7 +167,7 @@ const insertDetailSelling = (detailSellingId, sellingId, detailMedicines) => {
   insertQuery = `${subtotalQuery} ${firstMedicineQuery}${secondMedicineQuery}`;
 
   return new Promise((resolve, reject) =>
-    connection.query(`${insertQuery}`, (error, result) => {
+    pool.query(`${insertQuery}`, (error, result) => {
       if (!error) {
         resolve(result);
       } else {
@@ -166,4 +186,5 @@ module.exports = {
   insertDetailSelling,
   countAllDetailSelling,
   countAllSelling,
+  searchByIdAndDate 
 };

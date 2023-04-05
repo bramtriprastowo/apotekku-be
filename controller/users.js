@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { generateAccessToken, generateRefreshToken } = require("../helper/auth");
+const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
+const { generateAccessToken, generateRefreshToken, generateResetToken } = require("../helper/auth");
 const commonHelper = require("../helper/common");
 const {
   findEmail,
@@ -9,14 +11,20 @@ const {
   findId,
   selectAllUsers,
   countAllUsers,
+  findUserVerification,
+  activateUserAccount,
+  deleteUserVerification,
+  insertUserVerification,
+  insertResetVerification,
 } = require("../models/users");
+const { sendVerificationEmail, sendResetEmail } = require("../middlewares/send-email");
 
 // let refreshTokens = [];
 const usersController = {
   register: async (req, res) => {
     try {
       // Mengambil input dari req.body dan memberi nilai default jika tidak diisi
-      const id = req.body.id || 0;
+      const id = req.body.id || 1;
       const name = req.body.name || "";
       const email = req.body.email || "";
       const nip = req.body.nip || 0;
@@ -29,15 +37,8 @@ const usersController = {
       let errorMessage = [];
 
       //Verifikasi kelengkapan data untuk diinsert ke tabel users
-      if (!id || !name || !email || !nip || !password) {
+      if (!name || !email || !nip || !password) {
         errorMessage.push("Input is incomplete! Check your input!");
-      }
-
-      //Verifikasi ID (apakah ID sudah terdaftar)
-      const resultId = await findId(id);
-
-      if (resultId.length > 0) {
-        errorMessage.push("ID already registered!");
       }
 
       //Verifikasi email dan pengecekan apakah email sudah terdaftar
@@ -46,9 +47,7 @@ const usersController = {
       if (!String(email).toLowerCase().match(emailChecker)) {
         errorMessage.push("Email is invalid!");
       }
-
       const resultEmail = await findEmail(email);
-
       if (resultEmail.length > 0) {
         errorMessage.push(
           "Email already registered! Please use another email address!"
@@ -92,36 +91,50 @@ const usersController = {
 
       //Menampilkan error message jika ada error, atau melakukan insert data user
       if (errorMessage.length > 0) {
-        commonHelper.response(
+        return commonHelper.response(
           res,
           errorMessage,
           409,
           "Invalid registration input! Check data for details!"
         );
-      } else {
-        const insertData = {
-          id,
-          name,
-          email,
-          nip,
-          passwords: passwordHash,
-          role,
-        };
-        insertUser(insertData)
-          .then((result) =>
-            commonHelper.response(
-              res,
-              { affectedRows: result.affectedRows },
-              200,
-              "Succesfully registered!"
-            )
-          )
-          .catch((error) =>
-            commonHelper.response(res, error, 500, "Internal server error")
-          );
       }
+
+      //Data user
+      // const id = uuidv4();
+      const isVerified = 0; // Nilai "0" (atau false) berarti akun belum terverifikasi
+      const data = {
+        id,
+        name,
+        email,
+        nip,
+        passwords: passwordHash,
+        role,
+        isVerified,
+      };
+
+      //Melakukan insert ke tabel user dan user_verification
+      const verificationId = uuidv4();
+      const token = crypto.randomBytes(64).toString("hex");
+      await insertUser(data);
+      await insertUserVerification(verificationId, id, token);
+
+      //Mengirimkan email verifikasi
+      const verificationUrl = `${process.env.BASE_URL}users/verify/${id}/${token}`;
+      await sendVerificationEmail(
+        email,
+        name,
+        verificationUrl
+      );
+      //Mengirim pesan sukses atau error jika ada
+      return commonHelper.response(
+        res,
+        { name, email },
+        201,
+        "Succesfully registered! Please check your email for verification!"
+      );
     } catch (error) {
       console.log(error);
+      return commonHelper.response(res, error, 500);
     }
   },
 
@@ -151,6 +164,14 @@ const usersController = {
           "Password is invalid! Please check your password!"
         );
 
+      if (user.is_verified !== 1)
+        return commonHelper.response(
+          res,
+          null,
+          403,
+          "Your account is not verified yet! Please check your email to verify your account!"
+        );
+
       // Membuat access token dan refresh token untuk otentikasi
       delete user.Passwords;
       const payload = {
@@ -161,9 +182,10 @@ const usersController = {
       user.refreshToken = generateRefreshToken(payload);
 
       //Mengirimkan data user dan token atau menampilkan error
-      commonHelper.response(res, user, 200, "Login successful!");
+      return commonHelper.response(res, user, 200, "Login successful!");
     } catch (error) {
       console.log(error);
+      return commonHelper.response(res, null, 500);
     }
   },
 
@@ -194,7 +216,7 @@ const usersController = {
       };
 
       //Mengirimkan access token yang dihasilkan atau menampilkan error
-      commonHelper.response(
+      return commonHelper.response(
         res,
         newAccessToken,
         200,
@@ -203,11 +225,11 @@ const usersController = {
     } catch (error) {
       console.log(error);
       if (error && error.name === "JsonWebTokenError") {
-        commonHelper.response(res, error, 401, "Invalid access token!");
+        return commonHelper.response(res, error, 401, "Invalid access token!");
       } else if (error && error.name === "TokenExpiredError") {
-        commonHelper.response(res, error, 401, "Access token expired!");
+        return commonHelper.response(res, error, 401, "Access token expired!");
       } else {
-        commonHelper.response(res, error, 500, "Internal server error!");
+        return commonHelper.response(res, error, 500, "Internal server error!");
       }
     }
   },
@@ -215,9 +237,15 @@ const usersController = {
   listUsers: async (req, res) => {
     try {
       // Pengecekan role untuk otorisasi
-      const {role} = req.payload;
-      if (role === "user") return commonHelper.response(res, null, 403, "Unauthorized to access data!");
-      
+      const { role } = req.payload;
+      if (role === "user")
+        return commonHelper.response(
+          res,
+          null,
+          403,
+          "Unauthorized to access data!"
+        );
+
       // Mengambil data query dan menentukan default value query
       const page = req.query.page || 1;
       const limit = req.query.limit || 10;
@@ -225,7 +253,7 @@ const usersController = {
       const orderby = req.query.orderby || "ID";
       const order = req.query.order || "ASC";
 
-      // Melakukan fungsi untuk menampilkan data users dan melakukan pagination 
+      // Melakukan fungsi untuk menampilkan data users dan melakukan pagination
       const result = await selectAllUsers(limit, offset, orderby, order);
       const [userCount] = await countAllUsers();
       const totalData = userCount.count;
@@ -238,46 +266,122 @@ const usersController = {
       };
 
       //Mengirimkan data users atau menampilkan error
-      commonHelper.response(res, result, 200, "Get data success!", pagination);
+      return commonHelper.response(
+        res,
+        result,
+        200,
+        "Get data success!",
+        pagination
+      );
     } catch (error) {
       console.log(error);
-      
+
       if (error && error.code === "ER_SP_UNDECLARED_VAR") {
-        commonHelper.response(
+        return commonHelper.response(
           res,
           error,
           400,
           "Undeclared variable! Check your query params!"
         );
-      } else {
-        commonHelper.response(res, null, 500);
       }
+      return commonHelper.response(res, null, 500);
     }
+  },
+
+  verifyUser: async (req, res) => {
+    try {
+      const { userId, token } = req.params;
+      if (!userId) {
+        return commonHelper.response(res, null, 400, "userId is required!");
+      }
+      if (!token) {
+        return commonHelper.response(res, null, 400, "token is required!");
+      }
+      const [user] = await findId(userId);
+      if (!user) {
+        return commonHelper.response(res, null, 403, "User not found!");
+      }
+      if (user.is_verified === 1) {
+        return commonHelper.response(
+          res,
+          null,
+          410,
+          "Your user account has been verified!"
+        );
+      }
+      const [userVerification] = await findUserVerification(userId, token);
+      if (!userVerification) {
+        return commonHelper.response(
+          res,
+          null,
+          403,
+          "Invalid credential verification!"
+        );
+      }
+      await activateUserAccount(userId);
+      await deleteUserVerification(userId, token);
+      return commonHelper.response(
+        res,
+        null,
+        200,
+        "User verified successfully"
+      );
+    } catch (error) {
+      console.log(error);
+      return commonHelper.response(res, null, 500);
+    }
+  },
+
+  forgotPassword: async (req, res) => {
+    try {
+      const email = req.body.email || "";
+      if (!email) {
+        return commonHelper.response(res, null, 400, "Email is required!");
+      }
+      const [user] = await findEmail(email);
+      if (!user)
+        return commonHelper.response(
+          res,
+          null,
+          404,
+          "Email not registered! Please check your email address!"
+        );
+      const userId = user.ID;
+      const userEmail = user.Email;
+      const userName = user.Name;
+      const payload = {
+        id: userId,
+        email: userEmail
+      };
+      const resetToken = generateResetToken(payload);
+      const resetId = uuidv4();
+      await insertResetVerification(resetId, userId, resetToken);
+      const resetUrl = `${process.env.BASE_URL}users/reset-password/${resetId}/${resetToken}`
+      await sendResetEmail(
+        userEmail,
+        userName,
+        resetUrl
+      );
+      return commonHelper.response(
+        res,
+        null,
+        200,
+        "Reset password success! Please check your email for verification!"
+      );
+    } catch (error) {
+      console.log(error);
+      return commonHelper.response(res, null, 500);
+    }
+  },
+
+  resetPassword: async (req, res) => {
+  
   },
 
   // logout: async (req, res) => {
   //   try {
   //     refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
   //     commonHelper.response(res, [], 204, "");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // },
-
-  // profile: (req, res) => {
-  //   const posts = [
-  //     {
-  //       email: "bram@gmail.com",
-  //       judul: "admin",
-  //     },
-  //     {
-  //       email: "rizky@gmail.com",
-  //       judul: "superuser",
-  //     },
-  //   ];
-
-  //   try {
-  //     res.json(posts.filter((post) => post.email === req.user.email));
   //   } catch (error) {
   //     console.log(error);
   //   }

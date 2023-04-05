@@ -14,4 +14,4 @@ app.use("/api/v1", mainRouter)
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(process.env.PORT || "http://localhost:3000")
-})
+});
